@@ -1,0 +1,5 @@
+> 25/03/2025
+INitialisation du projet, on verra bien où ça mene. J'ai essayé d'utiliser mesa pour le multi agent
+mais même leur tuto bug, je pars pour l'instant sur une solution from scracth, l'idée de toute façon c'est
+plus d'identifier des phénomène à modéliser et de vérifier que ça fit la littérature, pour ce qui est de 
+l'implémentation en elle meme on verra ça ulétrieurement.
