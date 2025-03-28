@@ -13,6 +13,7 @@ class LymphocyteB:
         self.grid_size = grid_size
         self.color = 'blue'
         self.life_span = 10
+        self.age = 0
 
     def move(self):
         """Déplacement aléatoire dans la grille."""
@@ -23,6 +24,8 @@ class LymphocyteB:
     def activate(self):
         self.color = 'red'
     
+    def get_older(self):
+        self.age +=1
 
 class LymphocyteT:
     """Un agent simple qui se déplace sur une grille."""
@@ -34,6 +37,7 @@ class LymphocyteT:
         self.color = 'green'
         self.speed = 2
         self.life_span = 10
+        self.age = 0
 
     def move(self):
         """Déplacement aléatoire dans la grille."""
@@ -41,12 +45,14 @@ class LymphocyteT:
         self.x = np.clip(self.x + dx, 0, self.grid_size - 1)
         self.y = np.clip(self.y + dy, 0, self.grid_size - 1)
 
+    def get_older(self):
+        self.age +=1
+
 
 
 
 def detect_interaction(b_agent_list, t_agent_list):
     """ """
-
     # params
     interaction_treshold = 2
     
@@ -61,12 +67,23 @@ def detect_interaction(b_agent_list, t_agent_list):
                 b_agent.activate()
     
 
+def drop_old_cell(b_agent_list, t_agent_list):
+    """ """
 
+    b_pop = []
+    t_pop = []
 
+    # deal with b cells
+    for b_agent in b_agent_list:
+        if b_agent.age <= b_agent.life_span:
+            b_pop.append(b_agent)
 
+    # deal with t cells
+    for t_agent in t_agent_list:
+        if t_agent.age <= t_agent.life_span:
+            t_pop.append(t_agent)
 
-
-
+    return b_pop, t_pop
 
 
 
@@ -88,21 +105,26 @@ def run_simulation(n_steps:int):
     # Simulation
     for i in tqdm(range(n_steps), desc="Simulation en cours"):
 
-
         # detect b activation
         detect_interaction(b_agents, t_agents)
+
+        # drop old cells
+        b_agents, t_agents = drop_old_cell(b_agents, t_agents)
         
         plt.figure(figsize=(5, 5))
         plt.xlim(0, grid_size)
         plt.ylim(0, grid_size)
         for b_agent in b_agents:
             b_agent.move()
+            b_agent.get_older()
             plt.scatter(b_agent.x, b_agent.y, c=b_agent.color)
         for t_agent in t_agents:
             t_agent.move()
+            t_agent.get_older()
             plt.scatter(t_agent.x, t_agent.y, c=t_agent.color)
         plt.savefig(f"figures/step_{i}.png")
         plt.close()
+
 
 if __name__ == "__main__":
 
