@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import math
 import os
+import random
 
 class LymphocyteB:
     """Un agent simple qui se déplace sur une grille."""
@@ -86,6 +87,20 @@ def drop_old_cell(b_agent_list, t_agent_list):
     return b_pop, t_pop
 
 
+def init_random_age(b_agents, t_agents):
+    """assign a random age to cells, used at the begining of the simulation"""
+
+    b_pop = []
+    t_pop = []
+
+    for b_agent in b_agents:
+        b_agent.age = random.randint(0, b_agent.life_span)
+        b_pop.append(b_agent)
+    for t_agent in t_agents:
+        t_agent.age = random.randint(0, t_agent.life_span)
+        t_pop.append(t_agent)
+
+    return b_pop, t_pop
 
 
 def run_simulation(n_steps:int):
@@ -101,6 +116,9 @@ def run_simulation(n_steps:int):
     b_agents = [LymphocyteB(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_b_agents)]
     n_t_agents = 10
     t_agents = [LymphocyteT(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_t_agents)]
+
+    # init random age for cells
+    b_agents, t_agents = init_random_age(b_agents, t_agents)
 
     # Simulation
     for i in tqdm(range(n_steps), desc="Simulation en cours"):
