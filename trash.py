@@ -28,6 +28,12 @@ class LymphocyteB:
     def get_older(self):
         self.age +=1
 
+    def cell_division(self):
+        new_cell = LymphocyteB(self.x+1, self.y, self.grid_size)
+        new_cell.color = self.color
+        new_cell.age = 0
+        return new_cell
+
 class LymphocyteT:
     """Un agent simple qui se déplace sur une grille."""
 
@@ -49,7 +55,10 @@ class LymphocyteT:
     def get_older(self):
         self.age +=1
 
-
+    def cell_division(self):
+        new_cell = LymphocyteT(self.x+1, self.y, self.grid_size)
+        new_cell.age = 0
+        return new_cell
 
 
 def detect_interaction(b_agent_list, t_agent_list):
@@ -85,6 +94,74 @@ def drop_old_cell(b_agent_list, t_agent_list):
             t_pop.append(t_agent)
 
     return b_pop, t_pop
+
+
+
+def look_for_division(b_agent_list, t_agent_list):
+    """ """
+
+    # params
+    b_pop = []
+    t_pop = []
+    treshold = 2
+
+    # deal with b
+    for b_agent in b_agent_list:
+        ready_for_division = True
+
+        # check other b cell
+        for other_b in b_agent_list:
+            dist = math.sqrt((b_agent.x - other_b.x)**2 + (b_agent.y - other_b.y)**2)
+            if b_agent != other_b and dist  <= treshold:
+                ready_for_division = False
+                break
+            
+        # check t cells
+        for t_agent in t_agent_list:
+            dist = math.sqrt((b_agent.x - t_agent.x)**2 + (b_agent.y - t_agent.y)**2)
+            if b_agent != t_agent and dist  <= treshold:
+                ready_for_division = False
+                break
+
+        # add b cell to pop
+        b_pop.append(b_agent)
+        
+        # cell division
+        if ready_for_division:
+            new_b = b_agent.cell_division()
+            b_pop.append(new_b)
+            
+    # deal with t
+    for t_agent in t_agent_list:
+        ready_for_division = True
+
+        # check other t cell
+        for other_t in t_agent_list:
+            dist = math.sqrt((t_agent.x - other_t.x)**2 + (t_agent.y - other_t.y)**2)
+            if t_agent != other_t and dist <= treshold:
+                ready_for_division = False
+                break
+            
+        # check b cells
+        for b_agent in b_agent_list:
+            dist = math.sqrt((t_agent.x - b_agent.x)**2 + (t_agent.y - b_agent.y)**2)
+            if t_agent != b_agent and dist <= treshold:
+                ready_for_division = False
+                break
+
+        # add b cell to pop
+        t_pop.append(t_agent)
+        
+        # cell division
+        if ready_for_division:
+            new_t = t_agent.cell_division()
+            t_pop.append(new_t)
+
+
+    return b_pop, t_pop
+
+
+    
 
 
 def init_random_age(b_agents, t_agents):
@@ -125,6 +202,9 @@ def run_simulation(n_steps:int):
 
         # detect b activation
         detect_interaction(b_agents, t_agents)
+
+        # cell division
+        b_agents, t_agents = look_for_division(b_agents, t_agents)
 
         # drop old cells
         b_agents, t_agents = drop_old_cell(b_agents, t_agents)
