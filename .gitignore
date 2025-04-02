@@ -1,2 +1,3 @@
 .lymphvenv/*
 figures/*
+__pycache__/*
