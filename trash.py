@@ -198,9 +198,10 @@ def display_logs(log_folder:str, output_file:str) -> None:
 
     # params
     file_to_label = {
-        "nb_bcell.csv" : "Bcells",
+        "nb_bcell.csv" : "Bcells (Total)",
         "nb_tcell.csv": "Tcells",
         "nb_activated_bcell.csv": "Activated Bcells",
+        "nb_naive_bcell.csv": "Naive Bcells",
         "nb_total.csv": "Total",
     }
 
@@ -261,6 +262,7 @@ def run_simulation(n_steps:int, output_folder:str):
     step_to_nb = [{"STEP":0, "VALUE":n_b_agents}]
     step_to_nt = [{"STEP":0, "VALUE":n_t_agents}]
     step_to_nab = [{"STEP":0, "VALUE":0}]
+    step_to_nnb = [{"STEP":0, "VALUE":0}]
     step_to_n_total = [{"STEP":0,"VALUE":n_b_agents+n_t_agents}]
     step_to_density = [{"STEP":0, "VALUE":float(n_b_agents+n_t_agents) / (grid_size*grid_size)}]
 
@@ -272,6 +274,7 @@ def run_simulation(n_steps:int, output_folder:str):
 
         # init cmpts
         n_activated_b = 0
+        n_naive_b = 0
 
         # detect b activation
         detect_interaction(b_agents, t_agents)
@@ -290,9 +293,11 @@ def run_simulation(n_steps:int, output_folder:str):
             b_agent.get_older()
             plt.scatter(b_agent.x, b_agent.y, c=b_agent.color)
 
-            # compute nb of activared b cells
+            # compute nb of activated b cells
             if b_agent.activated:
                 n_activated_b +=1
+            else:
+                n_naive_b += 1
             
         for t_agent in t_agents:
             t_agent.move()
@@ -305,6 +310,7 @@ def run_simulation(n_steps:int, output_folder:str):
         step_to_nb.append({"STEP":i, "VALUE":len(b_agents)})
         step_to_nt.append({"STEP":i, "VALUE":len(t_agents)})
         step_to_nab.append({"STEP":i, "VALUE":n_activated_b})
+        step_to_nnb.append({"STEP":i, "VALUE":n_naive_b})
         step_to_n_total.append({"STEP":i, "VALUE":len(b_agents)+len(t_agents)})
         step_to_density.append({"STEP":i, "VALUE":float(len(b_agents)+len(t_agents)) / (grid_size*grid_size)})
 
@@ -315,6 +321,8 @@ def run_simulation(n_steps:int, output_folder:str):
     df.to_csv(f"{output_folder}/logs/nb_tcell.csv", index=False)
     df = pd.DataFrame(step_to_nab)
     df.to_csv(f"{output_folder}/logs/nb_activated_bcell.csv", index=False)
+    df = pd.DataFrame(step_to_nnb)
+    df.to_csv(f"{output_folder}/logs/nb_naive_bcell.csv", index=False)
     df = pd.DataFrame(step_to_n_total)
     df.to_csv(f"{output_folder}/logs/nb_total.csv", index=False)
     df = pd.DataFrame(step_to_density)
