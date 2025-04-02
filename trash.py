@@ -112,7 +112,6 @@ def look_for_division(b_agent_list, t_agent_list):
     return b_pop, t_pop
    
 
-
 def init_random_age(b_agents, t_agents):
     """assign a random age to cells, used at the begining of the simulation"""
 
@@ -127,7 +126,6 @@ def init_random_age(b_agents, t_agents):
         t_pop.append(t_agent)
 
     return b_pop, t_pop
-
 
 
 def display_logs(log_folder:str, output_file:str) -> None:
