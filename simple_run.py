@@ -15,11 +15,20 @@ from agents.t_cell import LymphocyteT
 # load modules
 import displayer
 
-def detect_interaction(b_agent_list, t_agent_list):
-    """ """
+def detect_interaction(b_agent_list:list, t_agent_list:list):
+    """Detect interaction between Bcells and Tcells, switch activation for Bcells
+    if a Tcells is nearby.
+
+    Args:
+        b_agent_list (list) : list of Bcell object
+        t_agent_list (list) : list of Tcell object
+    
+    """
+
     # params
     interaction_treshold = 2
-    
+
+    # loop over agent    
     for b_agent in b_agent_list:
         for t_agent in t_agent_list:
 
