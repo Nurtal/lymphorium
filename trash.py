@@ -5,6 +5,7 @@ import math
 import os
 import random
 import pandas as pd
+import glob
 
 class LymphocyteB:
     """Un agent simple qui se déplace sur une grille."""
@@ -183,6 +184,40 @@ def init_random_age(b_agents, t_agents):
     return b_pop, t_pop
 
 
+
+def display_logs(log_folder:str, output_file:str) -> None:
+    """Display Metrics present in log_folder
+
+    Args:
+        - log_folder (str) : path to the log folder
+        - output_file (str) : path to save the figure
+
+    """
+
+    # params
+    file_to_label = {
+        "nb_bcell.csv" : "Bcells",
+        "nb_tcell.csv": "Tcells",
+        "nb_activated_bcell.csv": "Activated Bcells",
+        "nb_total.csv": "Total",
+    }
+
+    # craft figure
+    plt.figure(figsize=(10, 6))
+    for file in list(file_to_label.keys()):
+        l = file_to_label[file]
+        file = f"{log_folder}/{file}"
+        df = pd.read_csv(file)
+        plt.plot(df["STEP"], df["VALUE"], label=l)
+    plt.xlabel("STEP")
+    plt.ylabel("VALUE")
+    plt.title("Simulation Logs")
+    plt.legend()
+    plt.grid()
+    plt.savefig(output_file)
+    plt.close()
+
+
 def run_simulation(n_steps:int, output_folder:str):
     """Run"""
 
@@ -269,3 +304,4 @@ def run_simulation(n_steps:int, output_folder:str):
 if __name__ == "__main__":
 
     run_simulation(100, "/tmp/zog")
+    display_logs("/tmp/zog/logs", "/tmp/test.png")
