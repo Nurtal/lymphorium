@@ -15,7 +15,7 @@ from agents.t_cell import LymphocyteT
 # load modules
 import displayer
 
-def detect_interaction(b_agent_list:list, t_agent_list:list):
+def detect_interaction(b_agent_list:list, t_agent_list:list) -> None:
     """Detect interaction between Bcells and Tcells, switch activation for Bcells
     if a Tcells is nearby.
 
@@ -40,9 +40,20 @@ def detect_interaction(b_agent_list:list, t_agent_list:list):
                 b_agent.activate()
     
 
-def drop_old_cell(b_agent_list, t_agent_list):
-    """ """
+def drop_old_cell(b_agent_list:list, t_agent_list:list):
+    """Drop cells that expect their lifespan
 
+    Args:
+        - b_agent_list (list) : list of Bcell object
+        - t_agent_list (list) : list of Tcell object
+
+    Returns:
+        - b_agent_list (list) : list of alive Bcell object
+        - t_agent_list (list) : list of alive Tcell object
+    
+    """
+
+    # params
     b_pop = []
     t_pop = []
 
