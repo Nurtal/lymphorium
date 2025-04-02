@@ -174,8 +174,14 @@ def init_random_age(b_agents:list, t_agents:list):
     return b_pop, t_pop
 
 
-def run_simulation(n_steps:int, output_folder:str):
-    """Run"""
+def run_simulation(n_steps:int, output_folder:str) -> None:
+    """Run Simulation
+
+    Args:
+        - n_steps (int) : number of steps for the simulation
+        - output_folder (str) : path to the output folder
+    
+    """
 
     # initialisation de l'environnement
     if not os.path.isdir(f"{output_folder}"):
