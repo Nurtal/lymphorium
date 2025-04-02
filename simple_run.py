@@ -48,8 +48,8 @@ def drop_old_cell(b_agent_list:list, t_agent_list:list):
         - t_agent_list (list) : list of Tcell object
 
     Returns:
-        - b_agent_list (list) : list of alive Bcell object
-        - t_agent_list (list) : list of alive Tcell object
+        - (list) : list of alive Bcell object
+        - (list) : list of alive Tcell object
     
     """
 
@@ -70,9 +70,19 @@ def drop_old_cell(b_agent_list:list, t_agent_list:list):
     return b_pop, t_pop
 
 
+def look_for_division(b_agent_list:list, t_agent_list:list):
+    """Look for cells in conditions for a cell division (basically check empty space around)
+    and activate division
 
-def look_for_division(b_agent_list, t_agent_list):
-    """ """
+    Args:
+        - b_agent_list (list) : list of Bcell object
+        - t_agent_list (list) : list of Tcell object
+
+    Returns:
+        - (list) : list of alive Bcell object
+        - (list) : list of alive Tcell object
+    
+    """
 
     # params
     b_pop = []
