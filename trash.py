@@ -6,6 +6,8 @@ import os
 import random
 import pandas as pd
 import glob
+import imageio.v2 as imageio
+
 
 class LymphocyteB:
     """Un agent simple qui se déplace sur une grille."""
@@ -218,6 +220,25 @@ def display_logs(log_folder:str, output_file:str) -> None:
     plt.close()
 
 
+def craft_simulation_animation(figure_folder:str, output_file:str) -> None:
+    """Use png images in figire folder to craft a gif
+
+    Args:
+        - figure_folder (str) : path to the folder with png files
+        - output_file (str) : path to the gif file
+    
+    """
+    
+    # load & sort images
+    files = sorted(glob.glob(f"{figure_folder}/step_*.png"))
+    frames = [imageio.imread(img) for img in files]
+
+    # save GIF
+    imageio.mimsave(output_file, frames, duration=0.5)
+
+
+
+
 def run_simulation(n_steps:int, output_folder:str):
     """Run"""
 
@@ -287,7 +308,6 @@ def run_simulation(n_steps:int, output_folder:str):
         step_to_n_total.append({"STEP":i, "VALUE":len(b_agents)+len(t_agents)})
         step_to_density.append({"STEP":i, "VALUE":float(len(b_agents)+len(t_agents)) / (grid_size*grid_size)})
 
-
     # save metrics in logs
     df = pd.DataFrame(step_to_nb)
     df.to_csv(f"{output_folder}/logs/nb_bcell.csv", index=False)
@@ -305,3 +325,4 @@ if __name__ == "__main__":
 
     run_simulation(100, "/tmp/zog")
     display_logs("/tmp/zog/logs", "/tmp/test.png")
+    craft_simulation_animation("/tmp/zog/figures", "/tmp/test.gif")
