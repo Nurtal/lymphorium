@@ -14,12 +14,66 @@ from agents.t_cell import LymphocyteT
 import displayer
 import environment
 
-def run_simulation(n_steps:int, output_folder:str) -> None:
+
+def parse_configuration(configuration_file:str)->dict:
+    """Parse a configuration file, returns extracted parameters in a dict.
+    dict contain a 'valid' key, set to False if configuration file is missing
+    or one of the expected parmaters is missing from file.
+    Expected parmaters are:
+        - n_steps
+        - output_folder
+        - grid_size
+        - n_b_agents
+        - n_t_agents
+
+    Args:
+        - configuration_file (str) : path to configuration file, supposed to be a ces file with two columns : 'PARAMETER' and 'VALUE'
+
+    Returns:
+        - (dict) : key as parameters and value as values
+        
+    """
+
+    # init configuration
+    configuration = {"valid":False}
+    mandatory_params = [
+        "n_steps",
+        "output_folder",
+        "grid_size",
+        "n_b_agents",
+        "n_t_agents"
+    ]
+
+    # check if config file exist
+    if not os.path.isfile(configuration_file):
+        print(f"[!] Can't find file {configuration_file}")
+        return configuration
+
+    # load parameters from configuration
+    df = pd.read_csv(configuration_file)
+    for index, row in df.iterrows():
+        configuration[row['PARAMETER']] = row['VALUE']
+
+    # look for mandatory parameters
+    configuration['valid'] = True
+    for mp in mandatory_params:
+        if mp not in configuration:
+            print(f"[!] Missing mandatory parameter {mp} from configuration file")
+            configuration['valid'] = False
+
+    # return configuration as a dict
+    return configuration
+
+
+def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int) -> None:
     """Run Simulation
 
     Args:
         - n_steps (int) : number of steps for the simulation
         - output_folder (str) : path to the output folder
+        - grid_size (int) : grid_size (assume grid is a square)
+        - n_b_agents (int) : number of b cells at initial condition
+        - n_t_agents (int) : number of t cells at initial condition
     
     """
 
@@ -32,10 +86,7 @@ def run_simulation(n_steps:int, output_folder:str) -> None:
         os.mkdir(f"{output_folder}/logs")
 
     # Initialisation de la simulation
-    grid_size = 20
-    n_b_agents = 10
     b_agents = [LymphocyteB(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_b_agents)]
-    n_t_agents = 10
     t_agents = [LymphocyteT(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_t_agents)]
 
     # init metrics
@@ -107,10 +158,40 @@ def run_simulation(n_steps:int, output_folder:str) -> None:
     df.to_csv(f"{output_folder}/logs/nb_total.csv", index=False)
     df = pd.DataFrame(step_to_density)
     df.to_csv(f"{output_folder}/logs/density.csv", index=False)
+
+
+def run(configuration_file:str):
+    """Run the simulation and create associated graphical representations
+    
+    Args:
+        configuration_file (str) : path to the configuration file
+    
+    """
+
+    # parse configuration
+    configuration = parse_configuration(configuration_file)
+
+    # check config validity
+    if configuration['valid']:
+
+        # run
+        run_simulation(
+                       int(configuration['n_steps']),
+                       str(configuration['output_folder']),
+                       int(configuration['grid_size']),
+                       int(configuration['n_b_agents']),
+                       int(configuration['n_t_agents'])
+        )
+
+        # create representations
+        displayer.display_logs(f"{configuration['output_folder']}/logs", f"{configuration['output_folder']}/test.png")
+        displayer.craft_simulation_animation(f"{configuration['output_folder']}/figures", f"{configuration['output_folder']}/test.gif")
     
 
 if __name__ == "__main__":
 
-    run_simulation(100, "/tmp/zog")
-    displayer.display_logs("/tmp/zog/logs", "/tmp/test.png")
-    displayer.craft_simulation_animation("/tmp/zog/figures", "/tmp/test.gif")
+    # run_simulation(100, "/tmp/zog")
+    # displayer.display_logs("/tmp/zog/logs", "/tmp/test.png")
+    # displayer.craft_simulation_animation("/tmp/zog/figures", "/tmp/test.gif")
+
+    run("/tmp/zog.conf")
