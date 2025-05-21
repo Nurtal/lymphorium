@@ -9,6 +9,7 @@ import pandas as pd
 # load agents
 from agents.b_cell import LymphocyteB
 from agents.t_cell import LymphocyteT
+from agents.pathogen import Pathogen
 
 # load modules
 import displayer
@@ -25,6 +26,7 @@ def parse_configuration(configuration_file:str)->dict:
         - grid_size
         - n_b_agents
         - n_t_agents
+        - n_pathogen_agents
 
     Args:
         - configuration_file (str) : path to configuration file, supposed to be a ces file with two columns : 'PARAMETER' and 'VALUE'
@@ -41,7 +43,8 @@ def parse_configuration(configuration_file:str)->dict:
         "output_folder",
         "grid_size",
         "n_b_agents",
-        "n_t_agents"
+        "n_t_agents",
+        "n_pathogen_agents"
     ]
 
     # check if config file exist
@@ -65,7 +68,7 @@ def parse_configuration(configuration_file:str)->dict:
     return configuration
 
 
-def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int) -> None:
+def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int, n_pathogen_agents:int) -> None:
     """Run Simulation
 
     Args:
@@ -74,6 +77,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         - grid_size (int) : grid_size (assume grid is a square)
         - n_b_agents (int) : number of b cells at initial condition
         - n_t_agents (int) : number of t cells at initial condition
+        - n_pathogen_agents (int) : number of pathogen cell at initial condition
     
     """
 
@@ -90,6 +94,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     # Initialisation de la simulation
     b_agents = [LymphocyteB(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_b_agents)]
     t_agents = [LymphocyteT(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_t_agents)]
+    pathogen_agents = [Pathogen(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_pathogen_agents)]
 
     # init metrics
     step_to_nb = [{"STEP":0, "VALUE":n_b_agents}]
@@ -116,7 +121,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         b_agents, t_agents = environment.look_for_division(b_agents, t_agents)
 
         # drop old cells
-        b_agents, t_agents = environment.drop_old_cell(b_agents, t_agents)
+        b_agents, t_agents = environment.drop_old_cell([b_agents, t_agents])
         
         plt.figure(figsize=(5, 5))
         plt.xlim(0, grid_size)
@@ -182,7 +187,8 @@ def run(configuration_file:str):
                        str(configuration['output_folder']),
                        int(configuration['grid_size']),
                        int(configuration['n_b_agents']),
-                       int(configuration['n_t_agents'])
+                       int(configuration['n_t_agents']),
+                       int(configuration['n_pathogen_agents'])
         )
 
         # create representations
@@ -196,4 +202,4 @@ if __name__ == "__main__":
     # displayer.display_logs("/tmp/zog/logs", "/tmp/test.png")
     # displayer.craft_simulation_animation("/tmp/zog/figures", "/tmp/test.gif")
 
-    run("/tmp/zog.conf")
+    run("ressources/exemple.conf")

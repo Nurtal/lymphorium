@@ -32,34 +32,27 @@ def detect_interaction(b_agent_list:list, t_agent_list:list) -> None:
                 b_agent.activate()
 
 
-def drop_old_cell(b_agent_list:list, t_agent_list:list):
-    """Drop cells that expect their lifespan
+def drop_old_cell(agent_list_list:list):
+    """Drop cells that exceed their lifespan
 
     Args:
-        - b_agent_list (list) : list of Bcell object
-        - t_agent_list (list) : list of Tcell object
+        - agent_list_list (list) : list of list of agents, e.g [b_agents, t_agents]
 
     Returns:
-        - (list) : list of alive Bcell object
-        - (list) : list of alive Tcell object
+        - (list) : updated list of agent list 
     
     """
 
-    # params
-    b_pop = []
-    t_pop = []
+    updated_list = []
+    for agent_list in agent_list_list:
+        agent_list_updated = []
+        for agent in agent_list:
+            if agent.age <= agent.life_span:
+                agent_list_updated.append(agent)
+        updated_list.append(agent_list_updated)
 
-    # deal with b cells
-    for b_agent in b_agent_list:
-        if b_agent.age <= b_agent.life_span:
-            b_pop.append(b_agent)
-
-    # deal with t cells
-    for t_agent in t_agent_list:
-        if t_agent.age <= t_agent.life_span:
-            t_pop.append(t_agent)
-
-    return b_pop, t_pop
+    return updated_list
+            
 
 
 def look_for_division(b_agent_list:list, t_agent_list:list):
