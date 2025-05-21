@@ -105,7 +105,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     step_to_density = [{"STEP":0, "VALUE":float(n_b_agents+n_t_agents) / (grid_size*grid_size)}]
 
     # init random age for cells
-    b_agents, t_agents = environment.init_random_age([b_agents, t_agents])
+    b_agents, t_agents, pathogen_agents = environment.init_random_age([b_agents, t_agents, pathogen_agents])
 
     # Simulation
     for i in tqdm(range(n_steps), desc="Simulation en cours"):
@@ -118,14 +118,16 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         environment.detect_interaction(b_agents, t_agents)
 
         # cell division
-        b_agents, t_agents = environment.look_for_division([b_agents, t_agents])
+        b_agents, t_agents, pathogen_agents = environment.look_for_division([b_agents, t_agents, pathogen_agents])
 
         # drop old cells
-        b_agents, t_agents = environment.drop_old_cell([b_agents, t_agents])
+        b_agents, t_agents, pathogen_agents = environment.drop_old_cell([b_agents, t_agents, pathogen_agents])
         
         plt.figure(figsize=(5, 5))
         plt.xlim(0, grid_size)
         plt.ylim(0, grid_size)
+
+        # deal with b cells
         for b_agent in b_agents:
             b_agent.move()
             b_agent.get_older()
@@ -137,10 +139,18 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
             else:
                 n_naive_b += 1
             
+        # deal wth t cells
         for t_agent in t_agents:
             t_agent.move()
             t_agent.get_older()
             plt.scatter(t_agent.x, t_agent.y, c=t_agent.color)
+
+        # deal with pathogen
+        for pathogen_agent in pathogen_agents:
+            pathogen_agent.move()
+            pathogen_agent.get_older()
+            plt.scatter(pathogen_agent.x, pathogen_agent.y, c=pathogen_agent.color)
+        
         plt.savefig(f"{output_folder}/images/step_{i}.png")
         plt.close()
 

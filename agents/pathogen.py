@@ -9,7 +9,7 @@ class Pathogen:
         self.x = x
         self.y = y
         self.grid_size = grid_size
-        self.color = 'orange'
+        self.color = 'pink'
         self.life_span = 30
         self.age = 0
 
