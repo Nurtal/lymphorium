@@ -118,7 +118,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         environment.detect_interaction(b_agents, t_agents)
 
         # cell division
-        b_agents, t_agents = environment.look_for_division(b_agents, t_agents)
+        b_agents, t_agents = environment.look_for_division([b_agents, t_agents])
 
         # drop old cells
         b_agents, t_agents = environment.drop_old_cell([b_agents, t_agents])

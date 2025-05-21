@@ -43,7 +43,10 @@ def drop_old_cell(agent_list_list:list):
     
     """
 
+    # params
     updated_list = []
+
+    # look for old agents
     for agent_list in agent_list_list:
         agent_list_updated = []
         for agent in agent_list:
@@ -53,80 +56,47 @@ def drop_old_cell(agent_list_list:list):
 
     return updated_list
             
-
-
-def look_for_division(b_agent_list:list, t_agent_list:list):
+def look_for_division(agent_list_list:list) -> list:
     """Look for cells in conditions for a cell division (basically check empty space around)
     and activate division
 
     Args:
-        - b_agent_list (list) : list of Bcell object
-        - t_agent_list (list) : list of Tcell object
+        - agent_list_list (list) : list of list of agents, e.g [b_agents, t_agents]
 
     Returns:
-        - (list) : list of alive Bcell object
-        - (list) : list of alive Tcell object
-    
+        - (list) : updated list of agent list 
+
     """
 
     # params
-    b_pop = []
-    t_pop = []
     treshold = 2
+    updated_list = []
 
-    # deal with b
-    for b_agent in b_agent_list:
-        ready_for_division = True
+    for agent_list in agent_list_list:
+        agent_list_updated = []
+        for agent in agent_list:
+            ready_for_division = True
 
-        # check other b cell
-        for other_b in b_agent_list:
-            dist = math.sqrt((b_agent.x - other_b.x)**2 + (b_agent.y - other_b.y)**2)
-            if b_agent != other_b and dist  <= treshold:
-                ready_for_division = False
-                break
-            
-        # check t cells
-        for t_agent in t_agent_list:
-            dist = math.sqrt((b_agent.x - t_agent.x)**2 + (b_agent.y - t_agent.y)**2)
-            if b_agent != t_agent and dist  <= treshold:
-                ready_for_division = False
-                break
+            # check other agent cell
+            for agent_list_to_check in agent_list_list:
+                for agent_to_check in agent_list_to_check:
+                    dist = math.sqrt((agent.x - agent_to_check.x)**2 + (agent.y - agent_to_check.y)**2)
+                    if agent != agent_to_check and dist  <= treshold:
+                        ready_for_division = False
+                        break
 
-        # add b cell to pop
-        b_pop.append(b_agent)
+            # add agent cell to pop
+            agent_list_updated.append(agent)
         
-        # cell division
-        if ready_for_division:
-            new_b = b_agent.cell_division()
-            b_pop.append(new_b)
+            # cell division
+            if ready_for_division:
+                new_agent = agent.cell_division()
+                agent_list_updated.append(new_agent)
+
+        # update list of list
+        updated_list.append(agent_list_updated)
             
-    # deal with t
-    for t_agent in t_agent_list:
-        ready_for_division = True
-
-        # check other t cell
-        for other_t in t_agent_list:
-            dist = math.sqrt((t_agent.x - other_t.x)**2 + (t_agent.y - other_t.y)**2)
-            if t_agent != other_t and dist <= treshold:
-                ready_for_division = False
-                break
-            
-        # check b cells
-        for b_agent in b_agent_list:
-            dist = math.sqrt((t_agent.x - b_agent.x)**2 + (t_agent.y - b_agent.y)**2)
-            if t_agent != b_agent and dist <= treshold:
-                ready_for_division = False
-                break
-
-        # add b cell to pop
-        t_pop.append(t_agent)
-        
-        # cell division
-        if ready_for_division:
-            new_t = t_agent.cell_division()
-            t_pop.append(new_t)
-
-    return b_pop, t_pop
+    return updated_list
 
 
 
