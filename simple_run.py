@@ -105,7 +105,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     step_to_density = [{"STEP":0, "VALUE":float(n_b_agents+n_t_agents) / (grid_size*grid_size)}]
 
     # init random age for cells
-    b_agents, t_agents = environment.init_random_age(b_agents, t_agents)
+    b_agents, t_agents = environment.init_random_age([b_agents, t_agents])
 
     # Simulation
     for i in tqdm(range(n_steps), desc="Simulation en cours"):

@@ -100,7 +100,7 @@ def look_for_division(agent_list_list:list) -> list:
 
 
 
-def init_random_age(b_agents:list, t_agents:list):
+def init_random_age_old(b_agents:list, t_agents:list):
     """assign a random age to cells, used at the begining of the simulation
     
     Args:
@@ -128,3 +128,31 @@ def init_random_age(b_agents:list, t_agents:list):
         t_pop.append(t_agent)
 
     return b_pop, t_pop
+
+def init_random_age(agent_list_list:list):
+    """assign a random age to cells, used at the begining of the simulation
+    
+    Args:
+        - agent_list_list (list) : list of list of agents, e.g [b_agents, t_agents]
+
+    Returns:
+        - (list) : updated list of agent list 
+    
+    """
+
+    # params
+    updated_list = []
+
+    # deal with Bcells
+    for agent_list in agent_list_list:
+
+        # set random age
+        agent_list_updated = []
+        for agent in agent_list:
+            agent.age = random.randint(0, agent.life_span)
+            agent_list_updated.append(agent)
+
+        # update list of agent list
+        updated_list.append(agent_list_updated)
+
+    return updated_list
