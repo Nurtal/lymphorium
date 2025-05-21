@@ -32,7 +32,7 @@ def detect_interaction(b_agent_list:list, t_agent_list:list) -> None:
                 b_agent.activate()
 
 
-def drop_old_cell(agent_list_list:list):
+def drop_old_cell(agent_list_list:list) -> list:
     """Drop cells that exceed their lifespan
 
     Args:
@@ -55,6 +55,7 @@ def drop_old_cell(agent_list_list:list):
         updated_list.append(agent_list_updated)
 
     return updated_list
+
             
 def look_for_division(agent_list_list:list) -> list:
     """Look for cells in conditions for a cell division (basically check empty space around)
@@ -99,37 +100,7 @@ def look_for_division(agent_list_list:list) -> list:
     return updated_list
 
 
-
-def init_random_age_old(b_agents:list, t_agents:list):
-    """assign a random age to cells, used at the begining of the simulation
-    
-    Args:
-        - b_agents (list) : list of Bcell object
-        - t_agents (list) : list of Tcell object
-
-    Returns:
-        - (list) : list of alive Bcell object
-        - (list) : list of alive Tcell object
-    
-    """
-
-    # params
-    b_pop = []
-    t_pop = []
-
-    # deal with Bcells
-    for b_agent in b_agents:
-        b_agent.age = random.randint(0, b_agent.life_span)
-        b_pop.append(b_agent)
-
-    # deal with Tcells
-    for t_agent in t_agents:
-        t_agent.age = random.randint(0, t_agent.life_span)
-        t_pop.append(t_agent)
-
-    return b_pop, t_pop
-
-def init_random_age(agent_list_list:list):
+def init_random_age(agent_list_list:list) -> list:
     """assign a random age to cells, used at the begining of the simulation
     
     Args:
