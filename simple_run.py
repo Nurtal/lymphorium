@@ -82,6 +82,8 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         os.mkdir(f"{output_folder}") 
     if not os.path.isdir(f"{output_folder}/figures"):
         os.mkdir(f"{output_folder}/figures")
+    if not os.path.isdir(f"{output_folder}/images"):
+        os.mkdir(f"{output_folder}/images")
     if not os.path.isdir(f"{output_folder}/logs"):
         os.mkdir(f"{output_folder}/logs")
 
@@ -134,7 +136,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
             t_agent.move()
             t_agent.get_older()
             plt.scatter(t_agent.x, t_agent.y, c=t_agent.color)
-        plt.savefig(f"{output_folder}/figures/step_{i}.png")
+        plt.savefig(f"{output_folder}/images/step_{i}.png")
         plt.close()
 
         # update metrics
@@ -184,8 +186,8 @@ def run(configuration_file:str):
         )
 
         # create representations
-        displayer.display_logs(f"{configuration['output_folder']}/logs", f"{configuration['output_folder']}/test.png")
-        displayer.craft_simulation_animation(f"{configuration['output_folder']}/figures", f"{configuration['output_folder']}/test.gif")
+        displayer.display_logs(f"{configuration['output_folder']}/logs", f"{configuration['output_folder']}/figures/logs.png")
+        displayer.craft_simulation_animation(f"{configuration['output_folder']}/images", f"{configuration['output_folder']}/figures/simulation.gif")
     
 
 if __name__ == "__main__":
