@@ -12,6 +12,7 @@ from agents.t_cell import LymphocyteT
 from agents.pathogen import Pathogen
 from agents.nk_cell import NaturalKiller
 from agents.neutro_cell import Neutrophile
+from agents.dendritic_cell import Dendritic
 
 # load modules
 import displayer
@@ -72,7 +73,7 @@ def parse_configuration(configuration_file:str)->dict:
     return configuration
 
 
-def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int, n_pathogen_agents:int, n_nk_agents:int, n_neutro_agents:int) -> None:
+def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int, n_pathogen_agents:int, n_nk_agents:int, n_neutro_agents:int, n_dendritic_agents:int) -> None:
     """Run Simulation
 
     Args:
@@ -84,6 +85,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         - n_pathogen_agents (int) : number of pathogen cell at initial condition
         - n_nk_agents (int) : number of natural killer cell at initial condition
         - n_neutro_agents (int) : number of neutrophile cell at initial condition
+        - n_dendritic_agents (int) : number of dendritic cell at initial condition
     
     """
 
@@ -102,7 +104,8 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     t_agents = [LymphocyteT(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_t_agents)]
     pathogen_agents = [Pathogen(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_pathogen_agents)]
     nk_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_nk_agents)]
-    neutro_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_nk_agents)]
+    neutro_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_neutro_agents)]
+    dendritic_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_dendritic_agents)]
 
     # init metrics
     step_to_nb = [{"STEP":0, "VALUE":n_b_agents}]
