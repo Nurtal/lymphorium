@@ -11,6 +11,7 @@ from agents.b_cell import LymphocyteB
 from agents.t_cell import LymphocyteT
 from agents.pathogen import Pathogen
 from agents.nk_cell import NaturalKiller
+from agents.neutro_cell import Neutrophile
 
 # load modules
 import displayer
@@ -46,7 +47,8 @@ def parse_configuration(configuration_file:str)->dict:
         "n_b_agents",
         "n_t_agents",
         "n_pathogen_agents",
-        "n_nk_agents"
+        "n_nk_agents",
+        "n_neutro_agents"
     ]
 
     # check if config file exist
@@ -70,7 +72,7 @@ def parse_configuration(configuration_file:str)->dict:
     return configuration
 
 
-def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int, n_pathogen_agents:int, n_nk_agents:int) -> None:
+def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int, n_pathogen_agents:int, n_nk_agents:int, n_neutro_agents:int) -> None:
     """Run Simulation
 
     Args:
@@ -81,6 +83,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         - n_t_agents (int) : number of t cells at initial condition
         - n_pathogen_agents (int) : number of pathogen cell at initial condition
         - n_nk_agents (int) : number of natural killer cell at initial condition
+        - n_neutro_agents (int) : number of neutrophile cell at initial condition
     
     """
 
@@ -99,6 +102,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     t_agents = [LymphocyteT(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_t_agents)]
     pathogen_agents = [Pathogen(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_pathogen_agents)]
     nk_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_nk_agents)]
+    neutro_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_nk_agents)]
 
     # init metrics
     step_to_nb = [{"STEP":0, "VALUE":n_b_agents}]
@@ -109,7 +113,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     step_to_density = [{"STEP":0, "VALUE":float(n_b_agents+n_t_agents) / (grid_size*grid_size)}]
 
     # init random age for cells
-    b_agents, t_agents, pathogen_agents, nk_agents = environment.init_random_age([b_agents, t_agents, pathogen_agents, nk_agents])
+    b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents = environment.init_random_age([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents])
 
     # Simulation
     for i in tqdm(range(n_steps), desc="Simulation en cours"):
@@ -122,10 +126,10 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         environment.detect_interaction(b_agents, t_agents)
 
         # cell division
-        b_agents, t_agents, pathogen_agents, nk_agents = environment.look_for_division([b_agents, t_agents, pathogen_agents, nk_agents])
+        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents = environment.look_for_division([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents])
 
         # drop old cells
-        b_agents, t_agents, pathogen_agents, nk_agents = environment.drop_old_cell([b_agents, t_agents, pathogen_agents, nk_agents])
+        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents = environment.drop_old_cell([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents])
         
         plt.figure(figsize=(5, 5))
         plt.xlim(0, grid_size)
@@ -160,6 +164,12 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
             nk_agent.move()
             nk_agent.get_older()
             plt.scatter(nk_agent.x, nk_agent.y, c=nk_agent.color)
+            
+        # deal with neutrophile cells
+        for neutro_agent in neutro_agents:
+            neutro_agent.move()
+            neutro_agent.get_older()
+            plt.scatter(neutro_agent.x, neutro_agent.y, c=nk_agent.color)
         
         plt.savefig(f"{output_folder}/images/step_{i}.png")
         plt.close()
@@ -209,7 +219,8 @@ def run(configuration_file:str):
                        int(configuration['n_b_agents']),
                        int(configuration['n_t_agents']),
                        int(configuration['n_pathogen_agents']),
-                       int(configuration['n_nk_agents'])
+                       int(configuration['n_nk_agents']),
+                       int(configuration['n_neutro_agents'])
         )
 
         # create representations
