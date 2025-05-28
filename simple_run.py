@@ -49,7 +49,8 @@ def parse_configuration(configuration_file:str)->dict:
         "n_t_agents",
         "n_pathogen_agents",
         "n_nk_agents",
-        "n_neutro_agents"
+        "n_neutro_agents",
+        "n_dendritic_agents"
     ]
 
     # check if config file exist
@@ -104,8 +105,8 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     t_agents = [LymphocyteT(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_t_agents)]
     pathogen_agents = [Pathogen(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_pathogen_agents)]
     nk_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_nk_agents)]
-    neutro_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_neutro_agents)]
-    dendritic_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_dendritic_agents)]
+    neutro_agents = [Neutrophile(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_neutro_agents)]
+    dendritic_agents = [Dendritic(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_dendritic_agents)]
 
     # init metrics
     step_to_nb = [{"STEP":0, "VALUE":n_b_agents}]
@@ -116,7 +117,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     step_to_density = [{"STEP":0, "VALUE":float(n_b_agents+n_t_agents) / (grid_size*grid_size)}]
 
     # init random age for cells
-    b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents = environment.init_random_age([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents])
+    b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents = environment.init_random_age([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents])
 
     # Simulation
     for i in tqdm(range(n_steps), desc="Simulation en cours"):
@@ -129,10 +130,10 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         environment.detect_interaction(b_agents, t_agents)
 
         # cell division
-        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents = environment.look_for_division([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents])
+        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents = environment.look_for_division([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents])
 
         # drop old cells
-        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents = environment.drop_old_cell([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents])
+        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents = environment.drop_old_cell([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents])
         
         plt.figure(figsize=(5, 5))
         plt.xlim(0, grid_size)
@@ -172,7 +173,13 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         for neutro_agent in neutro_agents:
             neutro_agent.move()
             neutro_agent.get_older()
-            plt.scatter(neutro_agent.x, neutro_agent.y, c=nk_agent.color)
+            plt.scatter(neutro_agent.x, neutro_agent.y, c=neutro_agent.color)
+
+        # deal with dendritic cells
+        for dendritic_agent in dendritic_agents:
+            dendritic_agent.move()
+            dendritic_agent.get_older()
+            plt.scatter(dendritic_agent.x, dendritic_agent.y, c=dendritic_agent.color)
         
         plt.savefig(f"{output_folder}/images/step_{i}.png")
         plt.close()
@@ -223,7 +230,8 @@ def run(configuration_file:str):
                        int(configuration['n_t_agents']),
                        int(configuration['n_pathogen_agents']),
                        int(configuration['n_nk_agents']),
-                       int(configuration['n_neutro_agents'])
+                       int(configuration['n_neutro_agents']),
+                       int(configuration['n_dendritic_agents'])
         )
 
         # create representations
