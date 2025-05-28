@@ -13,6 +13,7 @@ from agents.pathogen import Pathogen
 from agents.nk_cell import NaturalKiller
 from agents.neutro_cell import Neutrophile
 from agents.dendritic_cell import Dendritic
+from agents.macrophage_cell import Macrophage
 
 # load modules
 import displayer
@@ -50,7 +51,8 @@ def parse_configuration(configuration_file:str)->dict:
         "n_pathogen_agents",
         "n_nk_agents",
         "n_neutro_agents",
-        "n_dendritic_agents"
+        "n_dendritic_agents",
+        "n_macrophage_agents"
     ]
 
     # check if config file exist
@@ -74,7 +76,7 @@ def parse_configuration(configuration_file:str)->dict:
     return configuration
 
 
-def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int, n_pathogen_agents:int, n_nk_agents:int, n_neutro_agents:int, n_dendritic_agents:int) -> None:
+def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int, n_t_agents:int, n_pathogen_agents:int, n_nk_agents:int, n_neutro_agents:int, n_dendritic_agents:int, n_macrophage_agents:int) -> None:
     """Run Simulation
 
     Args:
@@ -87,6 +89,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         - n_nk_agents (int) : number of natural killer cell at initial condition
         - n_neutro_agents (int) : number of neutrophile cell at initial condition
         - n_dendritic_agents (int) : number of dendritic cell at initial condition
+        - n_macrophage_agents (int) : number of macrophage cell at initial condition
     
     """
 
@@ -107,6 +110,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     nk_agents = [NaturalKiller(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_nk_agents)]
     neutro_agents = [Neutrophile(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_neutro_agents)]
     dendritic_agents = [Dendritic(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_dendritic_agents)]
+    macrophage_agents = [Macrophage(np.random.randint(0, grid_size), np.random.randint(0, grid_size), grid_size) for _ in range(n_macrophage_agents)]
 
     # init metrics
     step_to_nb = [{"STEP":0, "VALUE":n_b_agents}]
@@ -117,7 +121,7 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
     step_to_density = [{"STEP":0, "VALUE":float(n_b_agents+n_t_agents) / (grid_size*grid_size)}]
 
     # init random age for cells
-    b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents = environment.init_random_age([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents])
+    b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents, macrophage_agents = environment.init_random_age([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents, macrophage_agents])
 
     # Simulation
     for i in tqdm(range(n_steps), desc="Simulation en cours"):
@@ -130,10 +134,10 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
         environment.detect_interaction(b_agents, t_agents)
 
         # cell division
-        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents = environment.look_for_division([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents])
+        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents, macrophage_agents = environment.look_for_division([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents, macrophage_agents])
 
         # drop old cells
-        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents = environment.drop_old_cell([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents])
+        b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents, macrophage_agents = environment.drop_old_cell([b_agents, t_agents, pathogen_agents, nk_agents, neutro_agents, dendritic_agents, macrophage_agents])
         
         plt.figure(figsize=(5, 5))
         plt.xlim(0, grid_size)
@@ -180,6 +184,12 @@ def run_simulation(n_steps:int, output_folder:str, grid_size:int, n_b_agents:int
             dendritic_agent.move()
             dendritic_agent.get_older()
             plt.scatter(dendritic_agent.x, dendritic_agent.y, c=dendritic_agent.color)
+
+        # deal with macrophage cells
+        for macrophage_agent in macrophage_agents:
+            macrophage_agent.move()
+            macrophage_agent.get_older()
+            plt.scatter(macrophage_agent.x, macrophage_agent.y, c=macrophage_agent.color)
         
         plt.savefig(f"{output_folder}/images/step_{i}.png")
         plt.close()
